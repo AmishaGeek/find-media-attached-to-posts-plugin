@@ -1,0 +1,80 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+ .fma-inner .fma-form table.rwpc.form-table td {
+    font-size: 13px;
+    vertical-align: middle;
+    margin: 0;
+    flex: 0 0 auto;    
+}
+
+.fma-inner .fma-form .form-table th {
+    padding: 10px 5px 10px 0;
+    font-weight: normal;
+    flex: 0 0 auto;
+}
+
+.fma-form .form-table thead {
+    border-bottom: 1px solid #ddd;
+    cursor: move;
+}
+
+.fma-form .form-table.rwpc_table tr td {
+    padding: 0;
+}
+
+.rwpc_inner .fma-form .form-table tbody tr {
+    display: flex;
+    align-items: center;
+}
+
+.rwpc_inner .fma-form table.rwpc.form-table td input {
+    margin: 0;
+}
+.fma-wrap form {
+    background: white;
+    padding: 10px 30px;
+    margin-top: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+.fma-inner.fma-row .notice {
+    margin: 20px 0 0 0;
+}
+.fma-inner.fma-row {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+}
+
+.fma-inner .fma-form .form-table tbody tr {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+    margin-bottom: 10px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgb(0 0 0 / 10%);
+}
+
+.fma-inner .fma-form table.rwpc.form-table td input {
+    margin: 0;
+}
+
+
+.fma-inner table .fma-tr th {
+    font-weight: bold !important;
+    font-size: 15px;
+}
+.fma-inner .fma-form .form-table tbody tr td .fma_chk_wp .fma-chk {
+    margin-bottom: 12px;
+}
+
+.fma-inner .fma-form .form-table tbody tr td .fma_chk_wp .fma-chk:last-child {
+    margin-bottom: 0;
+}
+.fma-inner form table tr td {
+    flex: 1;
+    margin: 0;
+}
