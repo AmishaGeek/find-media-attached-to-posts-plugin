@@ -56,8 +56,7 @@ class Find_Media_Attached_To_Posts_Admin_Display
         unset($post_types['attachment']);
         $post_types = implode(",",$post_types);
         $defaults = array(
-            'featured_image'        =>    '1',
-            'in_content'        =>    '1',
+            'general_option'        =>    'featured_image,in_content',
             'post_types'        =>    $post_types,
             'prevent_media' =>''
         );
@@ -85,13 +84,12 @@ class Find_Media_Attached_To_Posts_Admin_Display
     }
     public function register_admin_settings()
     {
-
         // If the theme options don't exist, create them.
         if (false == get_option('fma_display_options')) {
             $default_array = $this->default_display_options();
             add_option('fma_display_options', $default_array);
         }
-
+        //Register Setting Section
         add_settings_section(
             'general_settings_section',                        // ID used to identify this section and with which to register options
             __('', $this->plugin_name),                // Title to be displayed on the administration page
@@ -99,9 +97,10 @@ class Find_Media_Attached_To_Posts_Admin_Display
             'fma_display_options',                        // Page on which to add this section of options
         );
 
-        // Next, we'll introduce the fields for toggling the visibility of content elements.
+        // Create Settings Fields
+        //Field For General Display Options
         add_settings_field(
-            'featured_image',                                // ID used to identify the field throughout the theme
+            'general_option',                                // ID used to identify the field throughout the theme
             __('Display Option', $this->plugin_name),                    // The label to the left of the option interface element
             array($this, 'display_options_checkbox_callback'),    // The name of the function responsible for rendering the option interface
             'fma_display_options',                // The page on which this option will be displayed
@@ -116,19 +115,8 @@ class Find_Media_Attached_To_Posts_Admin_Display
             )
         );
 
-        // add_settings_field(
-        //     'in_content',
-        //     __('Content', $this->plugin_name),
-        //     array($this, 'checkbox_callback'),
-        //     'fma_display_options',
-        //     'general_settings_section',
-        //     array(
-        //         'name' => 'in_content',
-        //         'note'      =>'Enable if find attached image in content also'
-        //     )
-        // );
-
-          add_settings_field(
+        //Field For Post Types
+        add_settings_field(
             'post_types',                                
             __('Post Types', $this->plugin_name),                    
             array($this, 'post_type_checkbox_callback'),    
@@ -139,7 +127,9 @@ class Find_Media_Attached_To_Posts_Admin_Display
                 'class' => 'fma-tr'                   
             )
         );
-          add_settings_field(
+
+        //Field For Prevent Media from Delete 
+        add_settings_field(
             'prevent_media',                                
             __('Prevent Media', $this->plugin_name),                    
             array($this, 'prevent_checkbox_callback'),    
@@ -147,7 +137,7 @@ class Find_Media_Attached_To_Posts_Admin_Display
             'general_settings_section',                    
             array(
                 'name'    => 'prevent_media',                        
-                'note'      =>'Enable if not to delete image that is associated with any page/post',
+                'note'      =>'Enable this option to not delete images associated with any page/post',
                 'class' => 'fma-tr'
             )
         );
@@ -164,12 +154,7 @@ class Find_Media_Attached_To_Posts_Admin_Display
         // echo '<p>' . __('Select which areas of content you wish to display.', $this->plugin_name) . '</p>';
     } // end general_options_callback
 
-    /**
-     * This function renders the interface elements for toggling the visibility of the checkbox element.
-     *
-     * It accepts an array or arguments and expects the first element in the array to be the description
-     * to be displayed next to the checkbox.
-     */
+    /** Display Option Checkboxes Callback */
     public function display_options_checkbox_callback($args){
         $options = get_option('fma_display_options');
         $data = $args['data'];
@@ -199,6 +184,7 @@ class Find_Media_Attached_To_Posts_Admin_Display
         }
     }
 
+    /** Post Types Checkboxes */
     public function post_type_checkbox_callback($args)
     {
         $options = get_option('fma_display_options');
@@ -225,6 +211,7 @@ class Find_Media_Attached_To_Posts_Admin_Display
             <?php
     } // end checkbox_callback
 
+    /** Prevent Checkbox */
     public function prevent_checkbox_callback($args)
     {
         $options = get_option('fma_display_options');
@@ -243,6 +230,7 @@ class Find_Media_Attached_To_Posts_Admin_Display
         }
     } // end checkbox_callback
 
+    /** Sanitizes Inputs */
     public function validate_input_examples($input)
     {
     

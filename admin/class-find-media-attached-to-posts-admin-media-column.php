@@ -48,6 +48,7 @@ class Find_Media_Attached_To_Posts_Admin_Media_Column {
 		$this->version = $version;
 
 	}
+    /** Add Field In Grid Mode */
     public function attachment_fields_to_edit( $form_fields,$attachment) {
         $screen = get_current_screen();
         if ( $screen->parent_base != 'upload' ) {
@@ -60,7 +61,83 @@ class Find_Media_Attached_To_Posts_Admin_Media_Column {
         return $form_fields;
 	}
 
-	function get_posts_using_attachment( $attachment_id ) {
+    /** Add Meta Box In List Mode Edit Screen */
+    public function add_attachment_metaboxes() {
+        add_meta_box( 'fma_attachment_metaboxes', __( 'Attachment Used In', $this->plugin_name ), array($this, 'custom_attachment_metaboxes_func'), 'attachment', 'side' );
+    }
+    /** Meta Box Calllback */
+    function custom_attachment_metaboxes_func(){
+        $attachment_id = get_the_ID();
+        $html = $this->get_posts_using_attachment($attachment_id);
+        _e($html,$this->plugin_name);
+    }
+    /** Add Column in List Mode */
+	function manage_media_columns( $columns ) {
+		$filtered_columns = array();
+
+		foreach ( $columns as $key => $column ) {
+			$filtered_columns[ $key ] = $column;
+
+			if ( 'parent' === $key ) {
+				$filtered_columns['used_in'] = __( 'Attachment Used In', $this->plugin_name );
+			}
+		}
+
+		return $filtered_columns;
+	}
+    /** Manage Column */
+    function manage_media_custom_column( $column_name) {
+        $attachment_id = get_the_ID();
+
+		switch ( $column_name ) {
+			case 'used_in':
+				echo $this->get_posts_using_attachment( $attachment_id);
+				break;
+		}
+	}
+    /** Prevent Delete Media In List Mode */
+    function prevent_media_delete($attachment_id){
+        $option = (!empty(get_option('fma_display_options'))) ? get_option('fma_display_options') : '' ;
+        $prevent_media = (isset($option['prevent_media']) && !empty($option['prevent_media'])) ? $option['prevent_media'] : '';
+        if ($prevent_media == 1) {            
+            $html = $this->get_posts_using_attachment($attachment_id);
+            if (!empty($html) && $html != '(Unused)') {
+                wp_die( 'You cannot delete this attachment because its associated with following post/page <br>'.$html.'', $this->plugin_name );
+            }
+        }
+    }
+    /** Prevent Delete Media In Grid Mode */
+    function fma_prevent_delete_attachment_func(){
+        $attachment_id = $_POST['id'];
+        if (empty($attachment_id)) {
+            return;
+        }
+
+        if (!empty($attachment_id)) {
+            $option = (!empty(get_option('fma_display_options'))) ? get_option('fma_display_options') : '' ;
+            $prevent_media = (isset($option['prevent_media']) && !empty($option['prevent_media'])) ? $option['prevent_media'] : '';
+            if ($prevent_media == 1) {    
+                $html = $this->get_posts_using_attachment($attachment_id);
+                if (!empty($html) && $html != '(Unused)') {
+                    wp_send_json( array(
+                        'result' => true,
+                        'message' => 'You cannot delete this attachment because its associated with post/page.'
+                    )); 
+                   
+                }
+            }
+        }
+        else{
+            wp_send_json( array(
+                'result' => false,
+                'message' => 'attachment Id not found.'
+            ));
+        }
+       
+        wp_die();
+    }
+
+    function get_posts_using_attachment( $attachment_id ) {
 		$post_ids = $this->get_posts_by_attachment_id( $attachment_id );
 		$output = '';
 
@@ -107,9 +184,9 @@ class Find_Media_Attached_To_Posts_Admin_Media_Column {
 
 		return $output;
 	}
+    
     function get_posts_by_attachment_id( $attachment_id ) {
 		$used_as_thumbnail = array();
-
         $option = (!empty(get_option('fma_display_options'))) ? get_option('fma_display_options') : '' ;
         $general_option = (isset($option['general_option']) && !empty($option['general_option'])) ? explode(",",$option['general_option']) : [];
         $post_types_option  = (isset($option['post_types']) && !empty($option['post_types'])) ?  $option['post_types'] : 'any' ;
@@ -172,85 +249,4 @@ class Find_Media_Attached_To_Posts_Admin_Media_Column {
 		return $posts;
 	
 	}
-
-
-
-    public function add_attachment_metaboxes() {
-        add_meta_box( 'fma_attachment_metaboxes', __( 'Attachment Used In', $this->plugin_name ), array($this, 'custom_attachment_metaboxes_func'), 'attachment', 'side' );
-    }
-    function custom_attachment_metaboxes_func(){
-        $attachment_id = get_the_ID();
-        $html = $this->get_posts_using_attachment($attachment_id);
-        _e($html,$this->plugin_name);
-        
-    }
-
-
-
-	function manage_media_columns( $columns ) {
-		$filtered_columns = array();
-
-		foreach ( $columns as $key => $column ) {
-			$filtered_columns[ $key ] = $column;
-
-			if ( 'parent' === $key ) {
-				$filtered_columns['used_in'] = __( 'Attachment Used In', $this->plugin_name );
-			}
-		}
-
-		return $filtered_columns;
-	}
-
-    function manage_media_custom_column( $column_name) {
-        $attachment_id = get_the_ID();
-
-		switch ( $column_name ) {
-			case 'used_in':
-				echo $this->get_posts_using_attachment( $attachment_id);
-				break;
-		}
-	}
-    
-    function prevent_media_delete($attachment_id){
-        $option = (!empty(get_option('fma_display_options'))) ? get_option('fma_display_options') : '' ;
-        $prevent_media = (isset($option['prevent_media']) && !empty($option['prevent_media'])) ? $option['prevent_media'] : '';
-        if ($prevent_media == 1) {            
-            $html = $this->get_posts_using_attachment($attachment_id);
-            if (!empty($html) && $html != '(Unused)') {
-                wp_die( 'You cannot delete this attachment because its associated with following post/page <br>'.$html.'', $this->plugin_name );
-            }
-        }
-    }
-
-    function fma_prevent_delete_attachment_func(){
-        $attachment_id = $_POST['id'];
-        if (empty($attachment_id)) {
-            return;
-        }
-
-        if (!empty($attachment_id)) {
-            $option = (!empty(get_option('fma_display_options'))) ? get_option('fma_display_options') : '' ;
-            $prevent_media = (isset($option['prevent_media']) && !empty($option['prevent_media'])) ? $option['prevent_media'] : '';
-            if ($prevent_media == 1) {    
-                $html = $this->get_posts_using_attachment($attachment_id);
-                if (!empty($html) && $html != '(Unused)') {
-                    wp_send_json( array(
-                        'result' => true,
-                        'message' => 'You cannot delete this attachment because its associated with post/page.'
-                    )); 
-                   
-                }
-            }
-        }
-        else{
-            wp_send_json( array(
-                'result' => false,
-                'message' => 'attachment Id not found.'
-            ));
-        }
-       
-        wp_die();
-    }
-
-    
 }
