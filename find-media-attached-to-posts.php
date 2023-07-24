@@ -8,17 +8,17 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              https://https://geekcodelab.com/
+ * @link              https://geekcodelab.com/
  * @since             1.0.0
  * @package           Find_Media_Attached_To_Posts
  *
  * @wordpress-plugin
  * Plugin Name:       Find Media Attached To Posts
- * Plugin URI:        https://https://wordpress.org/plugins/find-media-attached-to-posts
- * Description:       This is a description of the plugin.
+ * Plugin URI:        https://wordpress.org/plugins/find-media-attached-to-posts
+ * Description:       Allows to find all posts/pages where a particular attachment (image, video, pdf etc.) is used.
  * Version:           1.0.0
  * Author:            Geek Code Lab
- * Author URI:        https://https://geekcodelab.com/
+ * Author URI:        https://geekcodelab.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       find-media-attached-to-posts

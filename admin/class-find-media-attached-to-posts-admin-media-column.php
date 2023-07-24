@@ -145,7 +145,7 @@ class Find_Media_Attached_To_Posts_Admin_Media_Column {
             $output ='Please Check <a href="upload.php?page=fma-options">Settings</a>';
         }
         else{
-            $posts = array_merge( $post_ids['thumbnail'], $post_ids['content'] );
+            $posts = array_merge( $post_ids['thumbnail'], $post_ids['content'], $post_ids['custom_field'] );
             $posts = array_unique( $posts );   
     
             $item_format   = '<strong>%1$s</strong> %3$s<br />';
@@ -167,7 +167,16 @@ class Find_Media_Attached_To_Posts_Admin_Media_Column {
                     $usage_context = __( '(As Featured Image and In Content)', $this->plugin_name );
                 } elseif ( in_array( $post_id, $post_ids['thumbnail'] ) ) {
                     $usage_context = __( '(As Featured Image)', $this->plugin_name );
-                } else {
+                } elseif ( in_array( $post_id, $post_ids['custom_field'] ) && in_array($post_id,$post_ids['thumbnail'])) {
+                    $usage_context = __( '(As Featured Image and In Custom Field)',  $this->plugin_name );
+                }
+                elseif ( in_array( $post_id, $post_ids['custom_field'] ) && in_array($post_id,$post_ids['content'])) {
+                    $usage_context = __( '(In Content and In Custom Field)',  $this->plugin_name );
+                }
+                elseif ( in_array( $post_id, $post_ids['custom_field'] ) ) {
+                    $usage_context = __( '(In Custom Field)',  $this->plugin_name );
+                }
+                else {
                     $usage_context = __( '(In content)', $this->plugin_name );
                 }
     
@@ -228,21 +237,45 @@ class Find_Media_Attached_To_Posts_Admin_Media_Column {
                     'no_found_rows'  => true,
                     'posts_per_page' => -1,
                 ) );
-    
+                // $content_query_by_id = new WP_Query( array(
+                //     's'              => $attachment_id,
+                //     'post_type'      => $splittedPostType,	
+                //     'fields'         => 'ids',
+                //     'no_found_rows'  => true,
+                //     'posts_per_page' => -1,
+                // ) );
+                // $used_in_content = array_merge( $used_in_content, $content_query_by_id->posts );
+                    
                 $used_in_content = array_merge( $used_in_content, $content_query->posts );
             }
             $used_in_content = array_unique( $used_in_content );
         }
-        if (!in_array('featured_image',$general_option) && !in_array('in_content',$general_option)) {
+
+        //Custom code - Get All attachments that are in a custom field
+		$used_in_custom_field = array();
+        if (in_array('in_custom_field',$general_option)) {            
+            $attachment_query = new WP_Query( array(
+                'meta_value'     => $attachment_id,
+                'post_type'      => $splittedPostType,
+                'fields'         => 'ids',
+                'no_found_rows'  => true,
+                'posts_per_page' => -1,
+            ) );
+    
+            $used_in_custom_field = $attachment_query->posts;
+            //End - Custom code - Get All attachments that are in a custom field
+        }
+            
+        if (!in_array('featured_image',$general_option) && !in_array('in_content',$general_option) && !in_array('in_custom_field',$general_option)) {
             $posts = array(
                 'featured_and_content_disable' => '1'
             );
         }
         else{
-
             $posts = array(
                 'thumbnail' => $used_as_thumbnail,
                 'content'   => $used_in_content,
+                'custom_field'       => $used_in_custom_field
             );
         }
 

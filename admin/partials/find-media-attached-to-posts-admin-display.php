@@ -56,7 +56,7 @@ class Find_Media_Attached_To_Posts_Admin_Display
         unset($post_types['attachment']);
         $post_types = implode(",",$post_types);
         $defaults = array(
-            'general_option'        =>    'featured_image,in_content',
+            'general_option'        =>    'featured_image,in_content,in_custom_field',
             'post_types'        =>    $post_types,
             'prevent_media' =>''
         );
@@ -110,6 +110,7 @@ class Find_Media_Attached_To_Posts_Admin_Display
                 'data'    => array(
                     'featured_image' => 'Featured Image',
                     'in_content' => 'Content',
+                    'in_custom_field' => 'Custom Field (ACF Image Field)'
                 ),  
                 'class' => 'fma-tr'
             )
